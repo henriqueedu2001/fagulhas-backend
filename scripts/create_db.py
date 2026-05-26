@@ -25,7 +25,7 @@ def main():
                 create_edition_table(cursor)
                 create_work_tags_table(cursor)
                 create_auth_table(cursor)
-                pass
+                create_edition_files_table(cursor)
     except Exception as error:
         log_message(f'Error: {error}')
     finally:
@@ -65,8 +65,8 @@ def create_edition_table(cursor: MySQLCursor):
     """
     create_my_texts_table_query = """
         CREATE TABLE IF NOT EXISTS edition (
-            work_id INT AUTO_INCREMENT PRIMARY KEY,
-            edition_number INT NOT NULL,
+            edition_id INT AUTO_INCREMENT PRIMARY KEY,
+            work_id INT,
             title VARCHAR(255) NOT NULL,
             date DATE NOT NULL,
             isbn VARCHAR(255) NULL,
@@ -108,6 +108,31 @@ def create_work_tags_table(cursor: MySQLCursor):
     return
 
 
+def create_edition_files_table(cursor: MySQLCursor):
+    """Creates, if not exists, the table text_tags
+
+    Args:
+        cursor (MySQLCursor): the MySQL cursor
+    """
+    create_edition_files_query = """
+        CREATE TABLE IF NOT EXISTS edition_files (
+            work_id INT NOT NULL,
+            edition_id INT NOT NULL,
+            filepath VARCHAR(255) NOT NULL,
+            category ENUM('cover_img', 'raw_txt', 'json_text', 'pdf_text', 'audio_text') NOT NULL,
+            FOREIGN KEY (work_id) REFERENCES work(work_id),
+            FOREIGN KEY (edition_id) REFERENCES edition(edition_id)
+        );
+    """
+    try:
+        log_message('Creating editions_files table...')
+        cursor.execute(create_edition_files_query)
+        log_message('Table edition_files created with success!')
+    except Exception as error:
+        log_message(f'Error: {error}')
+    return
+
+
 def create_auth_table(cursor: MySQLCursor):
     """Creates, if not exists, the table text_tags
 
@@ -126,6 +151,26 @@ def create_auth_table(cursor: MySQLCursor):
         log_message('Table work_tags created with success!')
     except Exception as error:
         log_message(f'Error: {error}')
+    return
+
+
+def drop_database(cursor: MySQLCursor):
+    drop_table(cursor, 'edition_files')
+    drop_table(cursor, 'work_tags')
+    drop_table(cursor, 'edition')
+    drop_table(cursor, 'work')
+    drop_table(cursor, 'auth')
+
+
+def drop_table(cursor: MySQLCursor, table_name: str):
+    """Drops a specific table from the database.
+
+    Args:
+        cursor (MySQLCursor): the MySQL cursor
+        table_name (str): the table name
+    """
+    drop_table = f'DROP TABLE {table_name};'
+    cursor.execute(drop_table)
     return
 
 
