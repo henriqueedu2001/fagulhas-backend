@@ -44,17 +44,17 @@ def create_work_table(cursor: MySQLCursor):
     Args:
         cursor (MySQLCursor): the MySQL cursor
     """
-    create_my_texts_table_query = """
+    create_work_table_query = """
         CREATE TABLE IF NOT EXISTS work (
             work_id INT AUTO_INCREMENT PRIMARY KEY,
-            title VARCHAR(255) NOT NULL,
+            title VARCHAR(255) UNIQUE NOT NULL,
             date DATE NOT NULL,
             category VARCHAR(255) NOT NULL
         );
     """
     try:
         log_message('Creating work table...')
-        cursor.execute(create_my_texts_table_query)
+        cursor.execute(create_work_table_query)
         log_message('Table work created with success!')
     except Exception as error:
         log_message(f'Error: {error}')
@@ -67,7 +67,7 @@ def create_edition_table(cursor: MySQLCursor):
     Args:
         cursor (MySQLCursor): the MySQL cursor
     """
-    create_my_texts_table_query = """
+    create_edition_table_query = """
         CREATE TABLE IF NOT EXISTS edition (
             edition_id INT AUTO_INCREMENT PRIMARY KEY,
             work_id INT,
@@ -75,6 +75,7 @@ def create_edition_table(cursor: MySQLCursor):
             idiom VARCHAR(255) NOT NULL,
             title VARCHAR(255) NOT NULL,
             date DATE NOT NULL,
+            synopsis TEXT NOT NULL,
             isbn VARCHAR(255) NULL,
             pages_num INT NOT NULL,
             views INT NOT NULL,
@@ -85,7 +86,7 @@ def create_edition_table(cursor: MySQLCursor):
     """
     try:
         log_message('Creating edition table...')
-        cursor.execute(create_my_texts_table_query)
+        cursor.execute(create_edition_table_query)
         log_message('Table edition created with success!')
     except Exception as error:
         log_message(f'Error: {error}')
@@ -124,8 +125,8 @@ def create_files_table(cursor: MySQLCursor):
         CREATE TABLE IF NOT EXISTS files (
             work_id INT NOT NULL,
             edition_id INT NOT NULL,
-            filepath VARCHAR(255) NOT NULL,
-            category ENUM('cover_img', 'raw_txt', 'latex_text', 'json_text', 'pdf_text', 'audio_text') NOT NULL,
+            filepath VARCHAR(255) UNIQUE NOT NULL,
+            category VARCHAR(255) NOT NULL,
             FOREIGN KEY (work_id) REFERENCES work(work_id),
             FOREIGN KEY (edition_id) REFERENCES edition(edition_id)
         );
