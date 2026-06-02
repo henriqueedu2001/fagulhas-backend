@@ -1,13 +1,17 @@
 from mysql.connector.pooling import MySQLConnectionPool
+from app.services.env import get_env_variables
+
+env_vars = get_env_variables()
 
 POOL = MySQLConnectionPool(
-    pool_name='fastapi_pool',
-    pool_size=10,
+    pool_name='MySQLConnectionPool',
+    pool_size=16,
     pool_reset_session=True,
 
-    host='localhost',
-    port=5467,
-    user='admin',
-    password='admin123',
-    database='fagulhas'
+    # env variables
+    host=env_vars.DB_HOST,
+    port=env_vars.DB_PORT,
+    user=env_vars.DB_USER,
+    password=env_vars.DB_PASSWORD,
+    database=env_vars.DB_DATABASE
 )

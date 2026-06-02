@@ -1,12 +1,15 @@
 import mysql.connector
 from mysql.connector import MySQLConnection
+from app.services.env import get_env_variables
+
+env_vars = get_env_variables()
 
 DB_CONFIG = {
-    'host': 'localhost',
-    'user': 'admin',
-    'password': 'admin123',
-    'database': 'fagulhas',
-    'port': '5467'
+    'host': env_vars.DB_HOST,
+    'user': env_vars.DB_USER,
+    'password': env_vars.DB_PASSWORD,
+    'database': env_vars.DB_DATABASE,
+    'port': env_vars.DB_PORT
 }
 
 def create_connection() -> MySQLConnection:
